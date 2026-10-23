@@ -1,0 +1,25 @@
+name: Update dogs
+on:
+  schedule: [{cron: "7 * * * *"}]   # hourly
+  workflow_dispatch:
+permissions: {contents: write}
+concurrency: {group: update-dogs, cancel-in-progress: false}
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install requests beautifulsoup4
+      - run: python -c "import scraper; scraper.run()"
+      - run: python export.py
+      - name: Alert digest previews (NOT sent)
+        env: {SUBSCRIBERS_CSV_URL: "${{ secrets.SUBSCRIBERS_CSV_URL }}"}
+        run: python digest.py
+      - uses: actions/upload-artifact@v4
+        with: {name: digest-preview, path: previews/, retention-days: 7}
+      - run: |
+          git config user.name "adoptmiamidogs-bot"; git config user.email "actions@users.noreply.github.com"
+          git add data.db docs/dogs.json; git diff --cached --quiet || git commit -m "Update dogs $(date -u +%FT%RZ)"; git push

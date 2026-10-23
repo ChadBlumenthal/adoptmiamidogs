@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.log
+previews/
+*.html.bak
+miad.html
+b.html
+data.db-journal

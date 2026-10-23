@@ -1,0 +1,106 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AdoptMiamiDogs — Free alerts for Miami shelter dogs</title>
+<meta name="description" content="Every adoptable dog at Miami-Dade & Broward county shelters, updated hourly. Free alerts in English & Spanish.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#FBF8F4;--ink:#1B1F24;--mut:#6B7280;--line:#ECE6DE;--coral:#FF6B5B;--coral2:#FF8A65;--teal:#0FA3A3;--teal2:#0B7F86;--card:#fff;--r:20px;--sh:0 1px 2px rgba(20,20,30,.04),0 8px 24px rgba(20,20,30,.06)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+a{color:inherit}button{font:inherit;cursor:pointer}
+header{position:sticky;top:0;z-index:20;backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);background:rgba(251,248,244,.72);border-bottom:1px solid rgba(236,230,222,.7)}
+.nav{max-width:1200px;margin:auto;display:flex;align-items:center;justify-content:space-between;padding:12px 20px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:-.02em;font-size:18px;text-decoration:none}
+.logo i{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,var(--coral),var(--coral2));color:#fff;font-style:normal;box-shadow:0 6px 16px rgba(255,107,91,.35)}
+.logo b{font-weight:800}.logo span{color:var(--teal)}
+.lang{display:flex;background:#fff;border:1px solid var(--line);border-radius:999px;padding:3px}.lang button{border:0;background:none;padding:6px 12px;border-radius:999px;font-size:13px;font-weight:600;color:var(--mut);transition:.2s}
+.lang button.on{background:var(--ink);color:#fff}
+.hero{max-width:1200px;margin:auto;padding:56px 20px 28px;display:grid;gap:28px;grid-template-columns:1fr}
+@media(min-width:900px){.hero{grid-template-columns:1.3fr 1fr;align-items:center;padding-top:72px}}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--teal2)}
+.dot{width:8px;height:8px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 0 rgba(34,197,94,.6);animation:pulse 2s infinite}@keyframes pulse{70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+h1{font-size:clamp(36px,6vw,64px);line-height:1.02;letter-spacing:-.035em;margin:18px 0 14px;font-weight:800}
+h1 em{font-style:normal;background:linear-gradient(90deg,var(--coral),var(--coral2) 40%,var(--teal));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{font-size:18px;color:var(--mut);line-height:1.55;max-width:560px;margin:0}
+.stats{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}.stat{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px 16px;min-width:120px;box-shadow:var(--sh)}
+.stat b{display:block;font-size:26px;letter-spacing:-.02em}.stat small{color:var(--mut);font-size:12px;font-weight:500}
+.alert{background:linear-gradient(160deg,#0FA3A3,#0B7F86);color:#fff;border-radius:28px;padding:28px;box-shadow:0 20px 50px rgba(11,127,134,.28);position:relative;overflow:hidden}
+.alert:after{content:"🐾";position:absolute;right:-10px;bottom:-24px;font-size:120px;opacity:.12;transform:rotate(-15deg)}
+.alert h3{margin:0 0 6px;font-size:22px;letter-spacing:-.02em}.alert p{margin:0 0 18px;opacity:.9;line-height:1.5;font-size:15px}
+.alert .cta{display:inline-flex;align-items:center;gap:8px;background:#fff;color:var(--teal2);border-radius:14px;padding:13px 20px;font-weight:700;text-decoration:none;transition:transform .2s,box-shadow .2s}
+.alert .cta:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(0,0,0,.18)}
+.alert ul{list-style:none;padding:0;margin:16px 0 0;display:grid;gap:6px;font-size:13px;opacity:.92}.alert li:before{content:"✓ ";font-weight:800}
+.filters{position:sticky;top:59px;z-index:10;background:linear-gradient(var(--bg) 75%,rgba(251,248,244,0));padding:12px 0 16px}
+.fwrap{max-width:1200px;margin:auto;padding:0 20px;display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;align-items:center}.fwrap::-webkit-scrollbar{display:none}
+.group{display:flex;gap:6px;flex-shrink:0;padding-right:10px;border-right:1px solid var(--line)}.group:last-child{border:0}
+.chip{border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;border-radius:999px;font-size:14px;font-weight:500;white-space:nowrap;transition:all .18s}
+.chip:hover{border-color:#d9cfc3;transform:translateY(-1px)}.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}.chip.new.on{background:var(--coral);border-color:var(--coral)}
+.search{flex-shrink:0;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:0 14px}
+.search input{border:0;outline:0;padding:10px 0;font:inherit;font-size:14px;width:150px;background:none}
+main{max-width:1200px;margin:auto;padding:0 20px 60px}
+.meta{display:flex;justify-content:space-between;align-items:baseline;margin:4px 0 16px;color:var(--mut);font-size:14px}.meta b{color:var(--ink);font-size:18px}
+.grid{display:grid;gap:18px;grid-template-columns:repeat(2,1fr)}@media(min-width:700px){.grid{grid-template-columns:repeat(3,1fr)}}@media(min-width:1050px){.grid{grid-template-columns:repeat(4,1fr)}}
+.card{background:var(--card);border-radius:var(--r);overflow:hidden;box-shadow:var(--sh);transition:transform .25s cubic-bezier(.2,.8,.2,1),box-shadow .25s;text-decoration:none;display:flex;flex-direction:column;animation:in .4s both}
+.card:hover{transform:translateY(-4px);box-shadow:0 2px 4px rgba(20,20,30,.05),0 18px 40px rgba(20,20,30,.12)}@keyframes in{from{opacity:0;transform:translateY(8px)}}
+.ph{position:relative;aspect-ratio:4/5;background:#F1ECE5;overflow:hidden}.ph img{width:100%;height:100%;object-fit:cover;transition:transform .5s;display:block}.card:hover .ph img{transform:scale(1.04)}
+.ph.none{display:grid;place-items:center;background:linear-gradient(135deg,#FFE3DC,#D8F3F1)}.paw{font-size:44px;opacity:.55}
+.badge{position:absolute;top:10px;left:10px;background:var(--coral);color:#fff;font-size:11px;font-weight:700;letter-spacing:.04em;padding:5px 9px;border-radius:999px;box-shadow:0 4px 12px rgba(255,107,91,.4)}
+.where{position:absolute;bottom:10px;left:10px;background:rgba(255,255,255,.88);backdrop-filter:blur(8px);font-size:11px;font-weight:600;padding:5px 9px;border-radius:999px}
+.body{padding:12px 14px 14px}.name{font-weight:700;font-size:17px;letter-spacing:-.01em;margin:0 0 2px}.breed{color:var(--mut);font-size:13px;margin:0 0 10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tags{display:flex;flex-wrap:wrap;gap:5px}.tag{font-size:11.5px;font-weight:600;background:#F5F1EB;padding:4px 8px;border-radius:8px;color:#4B5563}
+.empty{text-align:center;padding:60px 20px;color:var(--mut)}
+.sponsor{margin:28px 0 0;border:1.5px dashed var(--line);border-radius:var(--r);padding:18px;text-align:center;color:#A39A8E;font-size:13px}
+footer{border-top:1px solid var(--line);color:var(--mut);font-size:13px;line-height:1.6}footer div{max-width:1200px;margin:auto;padding:28px 20px}
+@media(max-width:480px){.hero{padding-top:32px}.sub{font-size:16px}.body{padding:10px 11px 12px}.name{font-size:15px}.stat{min-width:0;flex:1}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head><body>
+<header><div class="nav"><a class="logo" href="#"><i>🐶</i><b>Adopt<span>Miami</span>Dogs</b></a>
+<div class="lang"><button data-l="en">EN</button><button data-l="es">ES</button></div></div></header>
+<section class="hero"><div>
+ <span class="eyebrow"><span class="dot"></span><span data-t="live"></span></span>
+ <h1 data-th="h1"></h1><p class="sub" data-t="sub"></p>
+ <div class="stats"><div class="stat"><b id="sTotal">—</b><small data-t="sTotal"></small></div><div class="stat"><b id="sNew">—</b><small data-t="sNew"></small></div><div class="stat"><b>$0</b><small data-t="sFree"></small></div></div>
+</div>
+<div class="alert" id="alerts"><h3 data-t="aT"></h3><p data-t="aP"></p><a class="cta" id="signup" target="_blank" rel="noopener"><span data-t="aB"></span> →</a>
+<ul><li data-t="a1"></li><li data-t="a2"></li><li data-t="a3"></li></ul></div></section>
+<div class="filters"><div class="fwrap" id="fw"></div></div>
+<main><div class="meta"><span><b id="count"></b> <span data-t="match"></span></span><small id="upd"></small></div>
+<div class="grid" id="grid"></div><div class="sponsor" data-t="sponsor"></div></main>
+<footer><div data-t="foot"></div></footer>
+<script>
+const SIGNUP_URL="#alerts"; // TODO: free Google Form link (see README)
+const T={en:{live:"Updated hourly from county shelters",h1:"Find your Miami dog <em>before anyone else.</em>",sub:"Every adoptable dog at Miami-Dade & Broward county shelters in one place — plus free alerts the moment a dog that fits your family arrives.",
+ sTotal:"dogs waiting",sNew:"new in 48h",sFree:"always free",aT:"Get first dibs 🔔",aP:"Shelter adoptions are first-come, first-served. Tell us what you’re looking for and we’ll email you when a match arrives.",aB:"Create a free alert",
+ a1:"Size, age, breed & shelter filters",a2:"English or Spanish",a3:"No spam · unsubscribe anytime",match:"dogs match",updated:"Updated",any:"All",small:"Small",medium:"Medium",large:"Large",puppy:"Puppy",adult:"Adult",senior:"Senior",
+ male:"Boy",female:"Girl",new:"New this week",md:"Miami-Dade",bw:"Broward",search:"Search breed",noname:"Name coming soon",lbs:"lb",NEW:"NEW",none:"No dogs match these filters yet — try fewer filters or set an alert.",
+ sponsor:"Your local pet business could help Miami dogs here · Sponsor slot",foot:"AdoptMiamiDogs is free and independent — not affiliated with Miami-Dade or Broward County. Listings come from public shelter pages and may change quickly; always confirm with the shelter before visiting."},
+ es:{live:"Actualizado cada hora desde los refugios",h1:"Encuentra tu perro en Miami <em>antes que nadie.</em>",sub:"Todos los perros en adopción de los refugios de Miami-Dade y Broward en un solo lugar — y alertas gratis cuando llegue el perro ideal para tu familia.",
+ sTotal:"perros esperando",sNew:"nuevos en 48h",sFree:"siempre gratis",aT:"Sé el primero 🔔",aP:"En los refugios se adopta por orden de llegada. Dinos qué buscas y te avisamos por correo cuando llegue.",aB:"Crear alerta gratis",
+ a1:"Filtros de tamaño, edad, raza y refugio",a2:"En español o inglés",a3:"Sin spam · date de baja cuando quieras",match:"perros coinciden",updated:"Actualizado",any:"Todos",small:"Pequeño",medium:"Mediano",large:"Grande",puppy:"Cachorro",adult:"Adulto",senior:"Mayor",
+ male:"Macho",female:"Hembra",new:"Nuevos",md:"Miami-Dade",bw:"Broward",search:"Buscar raza",noname:"Nombre pronto",lbs:"lb",NEW:"NUEVO",none:"Ningún perro coincide — prueba con menos filtros o crea una alerta.",
+ sponsor:"Tu negocio de mascotas local podría ayudar aquí · Espacio para patrocinador",foot:"AdoptMiamiDogs es gratis e independiente — no está afiliado con los condados de Miami-Dade o Broward. Los listados vienen de páginas públicas y cambian rápido; confirma siempre con el refugio."}};
+const SH={md:"Miami-Dade Animal Services",bw:"Broward County Animal Care"};
+const G=[["size",["small","medium","large"]],["age_group",["puppy","adult","senior"]],["sex",["male","female"]],["shelter",["md","bw"]]];
+let lang=new URLSearchParams(location.search).get("lang")||((navigator.language||"en").startsWith("es")?"es":"en");if(!T[lang])lang="en";
+let data={dogs:[]},F={size:"",age_group:"",sex:"",shelter:"",onlynew:false,q:""};const cut=new Date(Date.now()-48*3600e3).toISOString().slice(0,19);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const title=s=>s.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
+function chips(){const t=T[lang];document.getElementById("fw").innerHTML=`<button class="chip new ${F.onlynew?"on":""}" data-k="onlynew">✨ ${t.new}</button>`+
+ G.map(([k,vs])=>`<div class="group">${vs.map(v=>`<button class="chip ${F[k]==v?"on":""}" data-k="${k}" data-v="${v}">${t[v]}</button>`).join("")}</div>`).join("")+
+ `<label class="search">🔍<input id="q" placeholder="${t.search}" value="${esc(F.q)}"></label>`;
+ document.getElementById("q").oninput=e=>{F.q=e.target.value;render()}}
+document.getElementById("fw").onclick=e=>{const b=e.target.closest(".chip");if(!b)return;const k=b.dataset.k;if(k=="onlynew")F.onlynew=!F.onlynew;else F[k]=F[k]==b.dataset.v?"":b.dataset.v;chips();render()};
+function setLang(l){lang=l;document.documentElement.lang=l;document.querySelectorAll("[data-t]").forEach(e=>e.textContent=T[l][e.dataset.t]);document.querySelectorAll("[data-th]").forEach(e=>e.innerHTML=T[l][e.dataset.th]);
+ document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("on",b.dataset.l==l));chips();render()}
+document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>setLang(b.dataset.l));
+function photo(d){return !d.photo||/No_pic/i.test(d.photo)?`<div class="ph none"><span class="paw">🐾</span>`:`<div class="ph"><img loading="lazy" src="${esc(d.photo)}" alt="${esc(d.name)}" onload="if(this.naturalWidth==232&&this.naturalHeight==246)this.onerror()" onerror="this.parentNode.classList.add('none');this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🐾',className:'paw'}))">`}
+function render(){const t=T[lang],q=F.q.toLowerCase();
+ const ds=data.dogs.filter(d=>(!F.size||d.size==F.size)&&(!F.age_group||d.age_group==F.age_group)&&(!F.sex||d.sex.toLowerCase()==F.sex)&&(!F.shelter||d.shelter==SH[F.shelter])&&(!q||d.breed.toLowerCase().includes(q))&&(!F.onlynew||d.first_seen>=cut));
+ document.getElementById("count").textContent=ds.length;
+ document.getElementById("grid").innerHTML=ds.length?ds.slice(0,400).map((d,i)=>`<a class="card" href="${esc(d.link)}" target="_blank" rel="noopener" style="animation-delay:${Math.min(i,12)*30}ms">${photo(d)}
+ ${d.first_seen>=cut?`<span class="badge">${t.NEW}</span>`:""}<span class="where">📍 ${d.shelter.startsWith("Miami")?t.md:t.bw}</span></div>
+ <div class="body"><p class="name">${/^A\d+$/i.test(d.name)?`<span style=color:var(--mut)>${t.noname}</span>`:esc(title(d.name))}</p><p class="breed">${esc(d.breed)}</p><div class="tags"><span class="tag">${d.sex.toLowerCase()=="male"?t.male:t.female}</span><span class="tag">${esc(d.age.replace(/ old/,""))}</span><span class="tag">${t[d.size]}${d.weight_lbs?` · ${Math.round(d.weight_lbs)} ${t.lbs}`:""}</span></div></div></a>`).join(""):`<div class="empty" style="grid-column:1/-1">${t.none}</div>`}
+document.getElementById("signup").href=SIGNUP_URL;
+fetch("dogs.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{data=j;document.getElementById("sTotal").textContent=j.count;document.getElementById("sNew").textContent=j.dogs.filter(d=>d.first_seen>=cut).length;
+ document.getElementById("upd").textContent=T[lang].updated+" "+new Date(j.updated).toLocaleString(lang,{hour:"numeric",minute:"2-digit",month:"short",day:"numeric"});render()});
+setLang(lang);
+</script></body></html>
