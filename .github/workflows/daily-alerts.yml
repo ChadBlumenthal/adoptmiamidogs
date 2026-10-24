@@ -15,6 +15,7 @@ jobs:
       - run: pip install requests beautifulsoup4
       - name: Send daily brief via Brevo (skips unless secrets are set)
         env:
+          ALERTS_ENABLED: ${{ vars.ALERTS_ENABLED }}
           GATE_8AM: ${{ github.event_name == 'schedule' && '1' || '' }}
           BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
           BREVO_LIST_ID: ${{ secrets.BREVO_LIST_ID }}

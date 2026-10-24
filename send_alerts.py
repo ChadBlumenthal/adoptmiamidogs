@@ -30,6 +30,8 @@ def main():
     import zoneinfo
     if os.environ.get("GATE_8AM") and datetime.datetime.now(zoneinfo.ZoneInfo("America/New_York")).hour!=8:
         print("Not 8 AM in New York; skipping (DST-safe double cron)."); return 0
+    if os.environ.get("ALERTS_ENABLED")!="true":
+        print("Alerts paused (repo variable ALERTS_ENABLED is not 'true'). Nothing sent."); return 0
     if not (KEY and LIST and SENDER and ADDR):
         print("Brevo sending DISABLED (set secrets BREVO_API_KEY, BREVO_LIST_ID, SENDER_EMAIL, POSTAL_ADDRESS). Nothing sent."); return 0
     c=scraper.db(); c.execute("create table if not exists alerts_sent(h text, dog_id text, at text, primary key(h,dog_id))")
