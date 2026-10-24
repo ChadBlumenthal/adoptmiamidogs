@@ -84,7 +84,7 @@ def fetch(slug):
         if not page or idx>=total: return dogs
         time.sleep(2)
 def run():
-    c=db(); now=datetime.datetime.now().isoformat(timespec="seconds"); first=c.execute("select count(*) from dogs").fetchone()[0]==0; new=[]
+    c=db(); now=datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None).isoformat(timespec="seconds"); first=c.execute("select count(*) from dogs").fetchone()[0]==0; new=[]
     for slug in SHELTERS:
         dogs=fetch(slug); ids={d["id"] for d in dogs}; n=0
         for d in dogs:
