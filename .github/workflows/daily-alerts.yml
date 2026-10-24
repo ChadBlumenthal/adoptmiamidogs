@@ -1,0 +1,27 @@
+name: Daily alert email (8 AM New York)
+on:
+  schedule: [{cron: "0 12 * * *"}, {cron: "0 13 * * *"}]   # EDT and EST; script runs only when it's 8 AM in New York
+  workflow_dispatch:
+permissions: {contents: write}
+concurrency: {group: update-dogs, cancel-in-progress: false}
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install requests beautifulsoup4
+      - name: Send daily brief via Brevo (skips unless secrets are set)
+        env:
+          GATE_8AM: ${{ github.event_name == 'schedule' && '1' || '' }}
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          BREVO_LIST_ID: ${{ secrets.BREVO_LIST_ID }}
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          POSTAL_ADDRESS: ${{ secrets.POSTAL_ADDRESS }}
+          BREVO_UNSUB_URL: ${{ secrets.BREVO_UNSUB_URL }}
+        run: python send_alerts.py
+      - run: |
+          git config user.name "adoptmiamidogs-bot"; git config user.email "actions@users.noreply.github.com"
+          git add data.db; git diff --cached --quiet || git commit -m "Daily alerts sent log $(date -u +%F)"; git pull --rebase -X theirs || true; git push

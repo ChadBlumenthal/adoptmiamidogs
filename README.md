@@ -41,4 +41,4 @@ Humane Society of Greater Miami (its own server-rendered adopt page; robots.txt 
 3. Forms: create a subscription form with double opt-in turned on, those attributes as fields, linked to the list. Copy its hosted share link into `SIGNUP_URL` in docs/index.html.
    Also create an unsubscribe form/link (or use Brevo's) for BREVO_UNSUB_URL.
 4. SMTP & API > API keys: create a key. In GitHub repo Settings > Secrets > Actions add: BREVO_API_KEY, BREVO_LIST_ID, SENDER_EMAIL, POSTAL_ADDRESS (PO box OK), BREVO_UNSUB_URL.
-The hourly workflow then sends at most one digest per subscriber per run, capped at 280/day.
+A separate daily workflow sends one 8 AM (New York) brief per subscriber with up to 12 dogs from the last 24h, only when there are matches; capped at 280/day.

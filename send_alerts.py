@@ -1,7 +1,7 @@
 """Real email alerts via Brevo (free plan: 300 emails/day). DISABLED unless BREVO_API_KEY + BREVO_LIST_ID + SENDER_EMAIL + POSTAL_ADDRESS are set.
 Subscribers live in Brevo: they join through Brevo's hosted double-opt-in form (Brevo handles consent + unsubscribe/blocklist).
 Contact attributes used (create in Brevo > Contacts > Settings): LANG, SIZE, AGE_GROUP, SEX, SHELTER, BREED (all optional text/category).
-One digest email per subscriber per run; already-alerted (subscriber,dog) pairs are stored as SHA-256 hashes (no emails in the public repo)."""
+One DAILY digest (8 AM America/New_York) per subscriber with dogs from the previous 24h, max 12; already-alerted (subscriber,dog) pairs are stored as SHA-256 hashes (no emails in the public repo)."""
 import os, sys, json, hashlib, datetime, html, requests, scraper, matcher
 KEY=os.environ.get("BREVO_API_KEY",""); LIST=os.environ.get("BREVO_LIST_ID",""); SENDER=os.environ.get("SENDER_EMAIL","")
 ADDR=os.environ.get("POSTAL_ADDRESS",""); UNSUB=os.environ.get("BREVO_UNSUB_URL","https://chadblumenthal.github.io/adoptmiamidogs/#alerts")
@@ -27,20 +27,25 @@ def body(s,dogs):
     un="Darse de baja" if es else "Unsubscribe"
     return f'<p>{intro}</p><ul>{li}</ul><p>Adoptions are first-come, first-served. <a href="{SITE}">{SITE}</a></p><hr><p style="font-size:12px;color:#666">{foot}<br><a href="{html.escape(UNSUB)}">{un}</a> · {html.escape(ADDR)}</p>'
 def main():
+    import zoneinfo
+    if os.environ.get("GATE_8AM") and datetime.datetime.now(zoneinfo.ZoneInfo("America/New_York")).hour!=8:
+        print("Not 8 AM in New York; skipping (DST-safe double cron)."); return 0
     if not (KEY and LIST and SENDER and ADDR):
         print("Brevo sending DISABLED (set secrets BREVO_API_KEY, BREVO_LIST_ID, SENDER_EMAIL, POSTAL_ADDRESS). Nothing sent."); return 0
     c=scraper.db(); c.execute("create table if not exists alerts_sent(h text, dog_id text, at text, primary key(h,dog_id))")
     today=datetime.datetime.utcnow().date().isoformat()
     used=c.execute("select count(distinct h||at) from alerts_sent where at>=?",(today,)).fetchone()[0]
-    data=json.load(open("docs/dogs.json")); since=(datetime.datetime.utcnow()-datetime.timedelta(days=2)).isoformat()
+    data=json.load(open("docs/dogs.json")); since=(datetime.datetime.utcnow()-datetime.timedelta(hours=24)).isoformat()
     new=[d for d in data["dogs"] if d["first_seen"]>=since]; sent=0; now=datetime.datetime.utcnow().isoformat(timespec="seconds")
     for s in map(sub_of,contacts()):
         if used+sent>=DAILY_CAP: print("daily cap reached"); break
-        h=H(s["email"]); m=[d for d in new if matcher.matches(s,d) and not c.execute("select 1 from alerts_sent where h=? and dog_id=?",(h,d["id"])).fetchone()][:10]
+        h=H(s["email"])
+        if c.execute("select 1 from alerts_sent where h=? and at>=?",(h,(datetime.datetime.utcnow()-datetime.timedelta(hours=20)).isoformat())).fetchone(): continue  # max 1 email/day
+        m=[d for d in new if matcher.matches(s,d) and not c.execute("select 1 from alerts_sent where h=? and dog_id=?",(h,d["id"])).fetchone()]; more=max(0,len(m)-12); m=m[:12]
         if not m: continue
         subj=(f"AdoptMiamiDogs: {len(m)} perro(s) nuevo(s) para ti" if s["lang"]=="es" else f"AdoptMiamiDogs: {len(m)} new dog(s) for you")
         r=requests.post(f"{API}/smtp/email",headers={"api-key":KEY},timeout=30,json={"sender":{"name":"AdoptMiamiDogs","email":SENDER},"to":[{"email":s["email"]}],
-            "subject":subj,"htmlContent":body(s,m),"headers":{"List-Unsubscribe":f"<{UNSUB}>"},"tags":["dog-alert"]})
+            "subject":subj,"htmlContent":body(s,m).replace("<hr>",(f'<p><a href="{SITE}">+{more} more on AdoptMiamiDogs</a></p><hr>' if more else "<hr>")),"headers":{"List-Unsubscribe":f"<{UNSUB}>"},"tags":["dog-alert"]})
         if r.status_code>=300: print("send failed",r.status_code,r.text[:200]); continue
         c.executemany("insert or ignore into alerts_sent values(?,?,?)",[(h,d["id"],now) for d in m]); c.commit(); sent+=1
     print(f"sent {sent} alert emails ({len(new)} recent dogs)"); return sent
