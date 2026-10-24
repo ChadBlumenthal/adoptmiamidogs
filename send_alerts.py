@@ -120,8 +120,8 @@ def body(s,dogs,more=0):
         UNSUB=_e(UNSUB),UN="Darse de baja" if es else "Unsubscribe",ADDR=(f" &middot; {_e(ADDR)}" if ADDR else ""))
 def main():
     import zoneinfo
-    if os.environ.get("GATE_8AM") and datetime.datetime.now(zoneinfo.ZoneInfo("America/New_York")).hour!=8:
-        print("Not 8 AM in New York; skipping (DST-safe double cron)."); return 0
+    if os.environ.get("GATE_8AM") and datetime.datetime.now(zoneinfo.ZoneInfo("America/New_York")).hour not in range(8,16):
+        print("Outside the 8 AM-4 PM New York send window; skipping (GitHub cron can run hours late; per-subscriber 20h dedupe prevents doubles)."); return 0
     if os.environ.get("ALERTS_ENABLED")!="true":
         print("Alerts paused (repo variable ALERTS_ENABLED is not 'true'). Nothing sent."); return 0
     if not (KEY and LIST and SENDER and ADDR):
