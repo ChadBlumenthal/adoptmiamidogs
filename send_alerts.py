@@ -39,16 +39,24 @@ def main():
     used=c.execute("select count(distinct h||at) from alerts_sent where at>=?",(today,)).fetchone()[0]
     data=json.load(open("docs/dogs.json")); since=(datetime.datetime.utcnow()-datetime.timedelta(hours=24)).isoformat()
     new=[d for d in data["dogs"] if d["first_seen"]>=since]; sent=0; now=datetime.datetime.utcnow().isoformat(timespec="seconds")
-    for s in map(sub_of,contacts()):
+    TEST=os.environ.get("TEST_SEND")=="1"; subs=list(map(sub_of,contacts()))
+    print(f"{len(subs)} confirmed subscriber(s) on list")
+    if TEST:
+        if len(subs)!=1: print("TEST aborted: test send needs exactly 1 contact on the list"); return 0
+        new=sorted(data["dogs"],key=lambda d:d["first_seen"],reverse=True)[:40]
+    for s in subs:
         if used+sent>=DAILY_CAP: print("daily cap reached"); break
         h=H(s["email"])
-        if c.execute("select 1 from alerts_sent where h=? and at>=?",(h,(datetime.datetime.utcnow()-datetime.timedelta(hours=20)).isoformat())).fetchone(): continue  # max 1 email/day
-        m=[d for d in new if matcher.matches(s,d) and not c.execute("select 1 from alerts_sent where h=? and dog_id=?",(h,d["id"])).fetchone()]; more=max(0,len(m)-12); m=m[:12]
+        if not TEST and c.execute("select 1 from alerts_sent where h=? and at>=?",(h,(datetime.datetime.utcnow()-datetime.timedelta(hours=20)).isoformat())).fetchone(): continue  # max 1 email/day
+        m=[d for d in new if matcher.matches(s,d) and (TEST or not c.execute("select 1 from alerts_sent where h=? and dog_id=?",(h,d["id"])).fetchone())]; more=max(0,len(m)-12); m=m[:12]
         if not m: continue
+        if TEST: subj0="[Test] "
+        else: subj0=""
         subj=(f"AdoptMiamiDogs: {len(m)} perro(s) nuevo(s) para ti" if s["lang"]=="es" else f"AdoptMiamiDogs: {len(m)} new dog(s) for you")
         r=requests.post(f"{API}/smtp/email",headers={"api-key":KEY},timeout=30,json={"sender":{"name":"AdoptMiamiDogs","email":SENDER},"to":[{"email":s["email"]}],
-            "subject":subj,"htmlContent":body(s,m).replace("<hr>",(f'<p><a href="{SITE}">+{more} more on AdoptMiamiDogs</a></p><hr>' if more else "<hr>")),"headers":{"List-Unsubscribe":f"<{UNSUB}>"},"tags":["dog-alert"]})
+            "subject":subj0+subj,"htmlContent":body(s,m).replace("<hr>",(f'<p><a href="{SITE}">+{more} more on AdoptMiamiDogs</a></p><hr>' if more else "<hr>")),"headers":{"List-Unsubscribe":f"<{UNSUB}>"},"tags":["dog-alert"]})
         if r.status_code>=300: print("send failed",r.status_code,r.text[:200]); continue
+        if TEST: sent+=1; print("test sent"); continue
         c.executemany("insert or ignore into alerts_sent values(?,?,?)",[(h,d["id"],now) for d in m]); c.commit(); sent+=1
     print(f"sent {sent} alert emails ({len(new)} recent dogs)"); return sent
 if __name__=="__main__": main()
