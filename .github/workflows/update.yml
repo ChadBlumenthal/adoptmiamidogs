@@ -18,6 +18,14 @@ jobs:
       - name: Alert digest previews (NOT sent)
         env: {SUBSCRIBERS_CSV_URL: "${{ secrets.SUBSCRIBERS_CSV_URL }}"}
         run: python digest.py
+      - name: Send real alerts via Brevo (skips unless secrets are set)
+        env:
+          BREVO_API_KEY: ${{ secrets.BREVO_API_KEY }}
+          BREVO_LIST_ID: ${{ secrets.BREVO_LIST_ID }}
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          POSTAL_ADDRESS: ${{ secrets.POSTAL_ADDRESS }}
+          BREVO_UNSUB_URL: ${{ secrets.BREVO_UNSUB_URL }}
+        run: python send_alerts.py
       - uses: actions/upload-artifact@v4
         with: {name: digest-preview, path: previews/, retention-days: 7}
       - run: |

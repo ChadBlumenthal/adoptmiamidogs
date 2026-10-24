@@ -22,3 +22,23 @@ cd docs && python3 -m http.server 8000     # static site
 ## Publish (needs Chad's GitHub account)
 git remote add origin https://github.com/<user>/adoptmiamidogs.git && git push -u origin main
 Settings -> Pages -> Deploy from branch `main`, folder `/docs`. Settings -> Actions -> Workflow permissions: Read and write.
+
+## More sources (Oct 2026)
+Live sources: Miami-Dade Animal Services, Broward County Animal Care, Palm Beach County Animal Care & Control (all public 24PetConnect listings),
+Humane Society of Greater Miami (its own server-rendered adopt page; robots.txt allows). Polite 1 req / 2 s.
+
+## Private-owner rehoming (moderated; nothing auto-publishes)
+1. Create a free Google Form "List a dog for rehoming" (fields: owner name, email, phone (optional), dog name, breed, age, sex, weight lbs, spayed/neutered, vaccinated,
+   photo upload, description, city/ZIP, why rehoming, checkbox "I own this dog and agree it may be shown publicly; no sale fee beyond a reasonable rehoming fee").
+   Responses stay private in Chad's Google account.
+2. Chad reviews each response. To publish, add an entry to `rehome/approved.json` with `"approved": true`
+   (`id, name, breed, age, age_group, sex, size, weight_lbs, photo, contact_url, approved_on`). Only those entries appear on the site.
+3. Remove the entry to unpublish.
+
+## Email alerts (Brevo free plan: 300 emails/day, no card) — DISABLED until secrets exist
+1. Create a free Brevo account; verify a single sender email (Senders, Domains & IPs > Senders).
+2. Contacts > Settings: create attributes LANG, SIZE, AGE_GROUP, SEX, SHELTER (md/bw/pb/hs), BREED. Create a list "Dog alerts" (note its ID).
+3. Forms: create a subscription form with double opt-in turned on, those attributes as fields, linked to the list. Copy its hosted share link into `SIGNUP_URL` in docs/index.html.
+   Also create an unsubscribe form/link (or use Brevo's) for BREVO_UNSUB_URL.
+4. SMTP & API > API keys: create a key. In GitHub repo Settings > Secrets > Actions add: BREVO_API_KEY, BREVO_LIST_ID, SENDER_EMAIL, POSTAL_ADDRESS (PO box OK), BREVO_UNSUB_URL.
+The hourly workflow then sends at most one digest per subscriber per run, capped at 280/day.
