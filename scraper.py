@@ -119,10 +119,12 @@ def fetch_hsbc():
         if not n or not tot or len(out)>=int(tot.group(1)): return out
         pg+=1; time.sleep(2)
     return out
+HSTC_FALLBACK='src="https://ws.petango.com/webservices/adoptablesearch/wsAdoptableAnimals2.aspx?species=Dog&gender=A&agegroup=All&location=&site=&onhold=A&orderby=Name&colnum=2&css=&authkey=b4d7594j32vjd80607m57u4yn05dosnx51er32b4j2723a3377&recAmount=&detailsInPopup=No&featuredPet=Include&stageID="'
 def fetch_hstc():
     """Humane Society of the Treasure Coast (Martin County): PetPoint/Petango adoptable-search widget embedded on hstc1.org/dogs (no robots.txt on ws.petango.com)."""
     from urllib.parse import urljoin
-    p=requests.get("https://www.hstc1.org/dogs/",headers=UA,timeout=30).text
+    try: p=requests.get("https://www.hstc1.org/dogs/",headers=UA,timeout=20).text
+    except requests.RequestException: p=HSTC_FALLBACK  # hstc1.org times out from GitHub's runners; widget URL is public in their page
     m=re.search(r'src="(https://ws\.petango\.com/webservices/adoptablesearch/wsAdoptableAnimals2\.aspx[^"]+)"',p)
     if not m: return []
     time.sleep(2); u=m.group(1).replace("&amp;","&"); s=BeautifulSoup(requests.get(u,headers=UA,timeout=30).text,"html.parser"); out=[]
@@ -150,7 +152,10 @@ def run():
     c=db(); now=datetime.datetime.now(datetime.timezone.utc).replace(tzinfo=None).isoformat(timespec="seconds"); first=c.execute("select count(*) from dogs").fetchone()[0]==0; new=[]
     for slug in SHELTERS:
         base=not c.execute("select 1 from runs where shelter=?",(slug,)).fetchone()
-        dogs=fetch(slug); ids={d["id"] for d in dogs}; n=0
+        try: dogs=fetch(slug)
+        except Exception as e: print(f"{slug}: FAILED ({e.__class__.__name__}) - keeping previous listings"); continue
+        if not dogs: print(f"{slug}: 0 dogs returned - keeping previous listings"); continue
+        ids={d["id"] for d in dogs}; n=0
         for d in dogs:
             if not d["age"]: d["age_group"]="adult"
             d["sex"]="Female" if "female" in d["sex"].lower() else "Male" if "male" in d["sex"].lower() else d["sex"]
