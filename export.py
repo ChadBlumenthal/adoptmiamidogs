@@ -1,7 +1,7 @@
 """Export active adoptable dogs to docs/dogs.json for the static GitHub Pages site."""
 import json, datetime, scraper
 c=scraper.db()
-rows=[dict(r) for r in c.execute("""select id,shelter,name,breed,age,age_group,sex,size,size_source,weight_lbs,photo,intake_date,link,first_seen
+rows=[dict(r) for r in c.execute("""select id,shelter,name,breed,age,age_group,sex,size,size_source,weight_lbs,photo,intake_date,link,first_seen,substr(coalesce(description,''),1,300) as description
   from dogs where active=1 and adoptable=1 order by intake_date desc""")]
 base={sl:(c.execute("select min(at) from runs where shelter=?",(sl,)).fetchone()[0] or "") for sl in scraper.SHELTERS}
 for r in rows:
