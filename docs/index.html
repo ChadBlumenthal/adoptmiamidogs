@@ -1,6 +1,6 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>AdoptMiamiDogs — Free alerts for Miami shelter dogs</title>
-<meta name="description" content="Every adoptable dog at Miami-Dade, Broward & Palm Beach shelters, updated hourly. Free alerts in English & Spanish.">
+<meta name="description" content="Every adoptable dog at South Florida shelters, from Miami to Fort Myers, updated hourly. Free alerts in English & Spanish.">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -32,6 +32,7 @@ h1 em{font-style:normal;background:linear-gradient(90deg,var(--coral),var(--cora
 .filters{position:sticky;top:59px;z-index:10;background:linear-gradient(var(--bg) 75%,rgba(251,248,244,0));padding:12px 0 16px}
 .fwrap{max-width:1200px;margin:auto;padding:0 20px;display:flex;gap:10px;overflow-x:auto;scrollbar-width:none;align-items:center}.fwrap::-webkit-scrollbar{display:none}
 .group{display:flex;gap:6px;flex-shrink:0;padding-right:10px;border-right:1px solid var(--line)}.group:last-child{border:0}
+.ddrow{margin-bottom:10px}.dd{display:flex;gap:8px;flex-wrap:nowrap;flex-shrink:0;align-items:flex-start}@media(max-width:640px){.ddrow{flex-wrap:wrap}.dd{width:100%}.sel{flex:1;min-width:0}.sel select{width:100%;max-width:none}.ddrow .search{width:100%}}.sel{display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:0 6px 0 12px;font-size:14px}.sel select{border:0;background:transparent;font:inherit;font-weight:500;color:var(--ink);padding:9px 4px;max-width:62vw;outline:none;cursor:pointer}.sel:focus-within{border-color:var(--ink)}
 .chip{border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;border-radius:999px;font-size:14px;font-weight:500;white-space:nowrap;transition:all .18s}
 .chip:hover{border-color:#d9cfc3;transform:translateY(-1px)}.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}.chip.new.on{background:var(--coral);border-color:var(--coral)}
 .search{flex-shrink:0;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:0 14px}
@@ -75,7 +76,7 @@ body.lock{overflow:hidden}
 </div>
 <div class="alert" id="alerts"><h3 data-t="aT"></h3><p data-t="aP"></p><a class="cta" id="signup" target="_blank" rel="noopener"><span data-t="aB"></span> →</a>
 <ul><li data-t="a1"></li><li data-t="a2"></li><li data-t="a3"></li></ul></div></section>
-<div class="filters"><div class="fwrap" id="fw"></div></div>
+<div class="filters"><div class="fwrap ddrow" id="dd"></div><div class="fwrap" id="fw"></div></div>
 <main><div class="meta"><span><b id="count"></b> <span data-t="match"></span></span><small id="upd"></small></div>
 <div class="grid" id="grid"></div><div class="sponsor" data-t="sponsor"></div></main>
 <div class="scrim" id="scrim" hidden></div>
@@ -84,37 +85,44 @@ body.lock{overflow:hidden}
 <footer><div data-t="foot"></div></footer>
 <script>
 const SIGNUP_URL=""; // paste Brevo hosted double-opt-in form URL here (see README "Email alerts"); empty = "coming soon"
-const T={en:{live:"Updated hourly from county shelters",conn:n=>`Connected to ${n} shelters`,shT:"Connected shelters",shS:"Where our listings come from. Updated every hour.",dogsN:"dogs",upd2:"Updated",official:"Official adoption page",src:"Source: public listings",soonT:"More shelters coming soon",soonS:"Rescues & more Miami shelters next",close:"Close",h1:"Find your Miami dog <em>before anyone else.</em>",sub:"Every adoptable dog at Miami-Dade, Broward & Palm Beach shelters in one place — plus free alerts the moment a dog that fits your family arrives.",
+const T={en:{live:"Updated hourly from county shelters",conn:n=>`Connected to ${n} shelters`,shT:"Connected shelters",shS:"Where our listings come from. Updated every hour.",dogsN:"dogs",upd2:"Updated",official:"Official adoption page",src:"Source: public listings",soonT:"More shelters coming soon",soonS:"Rescues & more Miami shelters next",close:"Close",h1:"Find your Miami dog <em>before anyone else.</em>",sub:"Every adoptable dog at South Florida shelters, from Miami to Fort Myers in one place — plus free alerts the moment a dog that fits your family arrives.",
  sTotal:"dogs waiting",sNew:"new in 48h",sFree:"always free",aT:"Get first dibs 🔔",aP:"Shelter adoptions are first-come, first-served. Tell us what you’re looking for and we’ll send one daily email at 8 AM, only when there are new matches.",aB:"Create a free alert",
  a1:"Size, age, breed & shelter filters",a2:"English or Spanish",a3:"No spam · unsubscribe anytime",match:"dogs match",updated:"Updated",any:"All",small:"Small",medium:"Medium",large:"Large",puppy:"Puppy",adult:"Adult",senior:"Senior",
- male:"Boy",female:"Girl",new:"New this week",md:"Miami-Dade",bw:"Broward",pb:"Palm Beach",hs:"HS Greater Miami",hb:"HS Broward",search:"Search breed",noname:"Name coming soon",lbs:"lb",NEW:"NEW",none:"No dogs match these filters yet — try fewer filters or set an alert.",
- sponsor:"Your local pet business could help Miami dogs here · Sponsor slot",foot:"AdoptMiamiDogs is free and independent — not affiliated with Miami-Dade or Broward County. Listings come from public shelter pages and may change quickly; always confirm with the shelter before visiting."},
- es:{live:"Actualizado cada hora desde los refugios",conn:n=>`Conectado a ${n} refugios`,shT:"Refugios conectados",shS:"De dónde vienen nuestros listados. Se actualiza cada hora.",dogsN:"perros",upd2:"Actualizado",official:"Página oficial de adopción",src:"Fuente: listados públicos",soonT:"Más refugios muy pronto",soonS:"Rescates y más refugios de Miami",close:"Cerrar",h1:"Encuentra tu perro en Miami <em>antes que nadie.</em>",sub:"Todos los perros en adopción de los refugios de Miami-Dade, Broward y Palm Beach en un solo lugar — y alertas gratis cuando llegue el perro ideal para tu familia.",
+ male:"Boy",female:"Girl",new:"New this week",md:"Miami-Dade",bw:"Broward",pb:"Palm Beach",hs:"HS Greater Miami",hb:"HS Broward",search:"Search breed",region:"Region",allRegions:"All regions",shelterF:"Shelter",allShelters:"All shelters","r_Treasure Coast":"Treasure Coast","r_Southwest FL":"Southwest FL",noname:"Name coming soon",lbs:"lb",NEW:"NEW",none:"No dogs match these filters yet — try fewer filters or set an alert.",
+ sponsor:"Your local pet business could help Miami dogs here · Sponsor slot",foot:"AdoptMiamiDogs is free and independent — not affiliated with any shelter or county government. Listings come from public shelter pages and may change quickly; always confirm with the shelter before visiting."},
+ es:{live:"Actualizado cada hora desde los refugios",conn:n=>`Conectado a ${n} refugios`,shT:"Refugios conectados",shS:"De dónde vienen nuestros listados. Se actualiza cada hora.",dogsN:"perros",upd2:"Actualizado",official:"Página oficial de adopción",src:"Fuente: listados públicos",soonT:"Más refugios muy pronto",soonS:"Rescates y más refugios de Miami",close:"Cerrar",h1:"Encuentra tu perro en Miami <em>antes que nadie.</em>",sub:"Todos los perros en adopción de los refugios de del sur de Florida, de Miami a Fort Myers en un solo lugar — y alertas gratis cuando llegue el perro ideal para tu familia.",
  sTotal:"perros esperando",sNew:"nuevos en 48h",sFree:"siempre gratis",aT:"Sé el primero 🔔",aP:"En los refugios se adopta por orden de llegada. Dinos qué buscas y te enviamos un solo correo diario a las 8 AM, solo cuando haya perros nuevos que coincidan.",aB:"Crear alerta gratis",
  a1:"Filtros de tamaño, edad, raza y refugio",a2:"En español o inglés",a3:"Sin spam · date de baja cuando quieras",match:"perros coinciden",updated:"Actualizado",any:"Todos",small:"Pequeño",medium:"Mediano",large:"Grande",puppy:"Cachorro",adult:"Adulto",senior:"Mayor",
- male:"Macho",female:"Hembra",new:"Nuevos",md:"Miami-Dade",bw:"Broward",pb:"Palm Beach",hs:"HS Greater Miami",hb:"HS Broward",search:"Buscar raza",noname:"Nombre pronto",lbs:"lb",NEW:"NUEVO",none:"Ningún perro coincide — prueba con menos filtros o crea una alerta.",
- sponsor:"Tu negocio de mascotas local podría ayudar aquí · Espacio para patrocinador",foot:"AdoptMiamiDogs es gratis e independiente — no está afiliado con los condados de Miami-Dade o Broward. Los listados vienen de páginas públicas y cambian rápido; confirma siempre con el refugio."}};
+ male:"Macho",female:"Hembra",new:"Nuevos",md:"Miami-Dade",bw:"Broward",pb:"Palm Beach",hs:"HS Greater Miami",hb:"HS Broward",search:"Buscar raza",region:"Región",allRegions:"Todas las regiones",shelterF:"Refugio",allShelters:"Todos los refugios","r_Treasure Coast":"Costa del Tesoro","r_Southwest FL":"Suroeste de FL","r_Other":"Otros",noname:"Nombre pronto",lbs:"lb",NEW:"NUEVO",none:"Ningún perro coincide — prueba con menos filtros o crea una alerta.",
+ sponsor:"Tu negocio de mascotas local podría ayudar aquí · Espacio para patrocinador",foot:"AdoptMiamiDogs es gratis e independiente — no está afiliado con ningún refugio ni gobierno del condado. Los listados vienen de páginas públicas y cambian rápido; confirma siempre con el refugio."}};
 const SH={md:"Miami-Dade Animal Services",bw:"Broward County Animal Care",pb:"Palm Beach County Animal Care & Control",hs:"Humane Society of Greater Miami",hb:"Humane Society of Broward County"};
-const G=[["size",["small","medium","large"]],["age_group",["puppy","adult","senior"]],["sex",["male","female"]],["shelter",["md","bw","pb","hs","hb"]]];
+const G=[["size",["small","medium","large"]],["age_group",["puppy","adult","senior"]],["sex",["male","female"]]];
 let lang=new URLSearchParams(location.search).get("lang")||((navigator.language||"en").startsWith("es")?"es":"en");if(!T[lang])lang="en";
-let data={dogs:[]},F={size:"",age_group:"",sex:"",shelter:"",onlynew:false,q:""};const cut=new Date(Date.now()-48*3600e3).toISOString().slice(0,19);
+let data={dogs:[]},F={size:"",age_group:"",sex:"",shelter:"",region:"",onlynew:false,q:""};const cut=new Date(Date.now()-48*3600e3).toISOString().slice(0,19);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const title=s=>s.toLowerCase().replace(/\b\w/g,c=>c.toUpperCase());
 function chips(){const t=T[lang];document.getElementById("fw").innerHTML=`<button class="chip new ${F.onlynew?"on":""}" data-k="onlynew">✨ ${t.new}</button>`+
- G.map(([k,vs])=>`<div class="group">${vs.map(v=>`<button class="chip ${F[k]==v?"on":""}" data-k="${k}" data-v="${v}">${t[v]}</button>`).join("")}</div>`).join("")+
+ G.map(([k,vs])=>`<div class="group">${vs.map(v=>`<button class="chip ${F[k]==v?"on":""}" data-k="${k}" data-v="${v}">${t[v]}</button>`).join("")}</div>`).join("");
+ document.getElementById("dd").innerHTML=`<div class="dd"><label class="sel"><span>📍</span><select id="selR" aria-label="${t.region}"><option value="">${t.allRegions} (${data.dogs.length})</option>${regions().map(([r,n])=>`<option value="${esc(r)}" ${F.region==r?"selected":""}>${esc(t["r_"+r]||r)} (${n})</option>`).join("")}</select></label><label class="sel"><span>🏠</span><select id="selS" aria-label="${t.shelterF}"><option value="">${t.allShelters}</option>${regions().filter(([r])=>!F.region||r==F.region).map(([r])=>`<optgroup label="${esc(t["r_"+r]||r)}">${shelters().filter(s=>s.region==r).map(s=>`<option value="${esc(s.name)}" ${F.shelter==s.name?"selected":""}>${esc(s.name)} (${s.count})</option>`).join("")}</optgroup>`).join("")}</select></label></div>`+
  `<label class="search">🔍<input id="q" placeholder="${t.search}" value="${esc(F.q)}"></label>`;
- document.getElementById("q").oninput=e=>{F.q=e.target.value;render()}}
+ document.getElementById("q").oninput=e=>{F.q=e.target.value;render()};
+ document.getElementById("selR").onchange=e=>{F.region=e.target.value;if(F.shelter&&regionOf(F.shelter)!=F.region&&F.region)F.shelter="";chips();render()};
+ document.getElementById("selS").onchange=e=>{F.shelter=e.target.value;render()}}
+function regionOf(n){const s=shelters().find(s=>s.name==n);return s?s.region||"Other":"Other"}
+const RORD=["Miami-Dade","Broward","Palm Beach","Treasure Coast","Keys","Southwest FL","Other"];
+function regions(){const m={};shelters().forEach(s=>m[s.region||"Other"]=(m[s.region||"Other"]||0)+s.count);return RORD.filter(r=>m[r]).map(r=>[r,m[r]])}
+const short=n=>n.replace(/ County/,"").replace(/ (Domestic )?Animal (Care( & Control)?|Services)$/,"").replace(/Humane Society of (the )?/,"HS ");
 document.getElementById("fw").onclick=e=>{const b=e.target.closest(".chip");if(!b)return;const k=b.dataset.k;if(k=="onlynew")F.onlynew=!F.onlynew;else F[k]=F[k]==b.dataset.v?"":b.dataset.v;chips();render()};
 function setLang(l){lang=l;document.documentElement.lang=l;document.querySelectorAll("[data-t]").forEach(e=>e.textContent=T[l][e.dataset.t]);document.querySelectorAll("[data-th]").forEach(e=>e.innerHTML=T[l][e.dataset.th]);
  document.querySelectorAll(".lang button").forEach(b=>b.classList.toggle("on",b.dataset.l==l));chips();render();renderSh()}
 document.querySelectorAll(".lang button").forEach(b=>b.onclick=()=>setLang(b.dataset.l));
 function photo(d){return !d.photo||/No_pic/i.test(d.photo)?`<div class="ph none"><span class="paw">🐾</span>`:`<div class="ph"><img loading="lazy" src="${esc(d.photo)}" alt="${esc(d.name)}" onload="if(this.naturalWidth==232&&this.naturalHeight==246)this.onerror()" onerror="this.parentNode.classList.add('none');this.replaceWith(Object.assign(document.createElement('span'),{textContent:'🐾',className:'paw'}))">`}
 function render(){const t=T[lang],q=F.q.toLowerCase();
- const ds=data.dogs.filter(d=>(!F.size||d.size==F.size)&&(!F.age_group||d.age_group==F.age_group)&&(!F.sex||d.sex.toLowerCase()==F.sex)&&(!F.shelter||d.shelter==SH[F.shelter])&&(!q||d.breed.toLowerCase().includes(q))&&(!F.onlynew||d.first_seen>=cut));
+ const ds=data.dogs.filter(d=>(!F.size||d.size==F.size)&&(!F.age_group||d.age_group==F.age_group)&&(!F.sex||d.sex.toLowerCase()==F.sex)&&(!F.shelter||d.shelter==F.shelter)&&(!F.region||regionOf(d.shelter)==F.region)&&(!q||d.breed.toLowerCase().includes(q))&&(!F.onlynew||d.first_seen>=cut));
  document.getElementById("count").textContent=ds.length;
  document.getElementById("grid").innerHTML=ds.length?ds.slice(0,400).map((d,i)=>`<a class="card" href="${esc(d.link)}" target="_blank" rel="noopener" style="animation-delay:${Math.min(i,12)*30}ms">${photo(d)}
- ${d.first_seen>=cut?`<span class="badge">${t.NEW}</span>`:""}<span class="where">📍 ${t[Object.keys(SH).find(k=>SH[k]===d.shelter)]||d.shelter}</span></div>
- <div class="body"><p class="name">${/^A\d+$/i.test(d.name)?`<span style=color:var(--mut)>${t.noname}</span>`:esc(title(d.name))}</p><p class="breed">${esc(d.breed)}</p><div class="tags"><span class="tag">${d.sex.toLowerCase()=="male"?t.male:t.female}</span><span class="tag">${esc(d.age.replace(/ old/,""))}</span><span class="tag">${t[d.size]}${d.weight_lbs?` · ${Math.round(d.weight_lbs)} ${t.lbs}`:""}</span></div></div></a>`).join(""):`<div class="empty" style="grid-column:1/-1">${t.none}</div>`}
+ ${d.first_seen>=cut?`<span class="badge">${t.NEW}</span>`:""}<span class="where">📍 ${esc(short(d.shelter))}</span></div>
+ <div class="body"><p class="name">${/^(A\d+|new pet)$/i.test(d.name.trim())?`<span style=color:var(--mut)>${t.noname}</span>`:esc(title(d.name))}</p><p class="breed">${esc(d.breed)}</p><div class="tags"><span class="tag">${d.sex.toLowerCase()=="male"?t.male:t.female}</span><span class="tag">${esc(d.age.replace(/ old/,""))}</span><span class="tag">${t[d.size]}${d.weight_lbs?` · ${Math.round(d.weight_lbs)} ${t.lbs}`:""}</span></div></div></a>`).join(""):`<div class="empty" style="grid-column:1/-1">${t.none}</div>`}
 
 function shelters(){return data.shelters||Object.values(SH).map(n=>({name:n,count:data.dogs.filter(d=>d.shelter==n).length}))}
 function fmt(t){return t?new Date(t).toLocaleString(lang,{month:"short",day:"numeric",hour:"numeric",minute:"2-digit"}):"—"}
@@ -131,6 +139,6 @@ document.addEventListener("keydown",e=>{if(dlg.hidden)return;if(e.key=="Escape")
 if(location.hash=="#shelters")setTimeout(openSh,600);
 {const b=document.getElementById("signup"); if(SIGNUP_URL) b.href=SIGNUP_URL; else {b.removeAttribute("target"); b.href="#alerts"; b.style.opacity=.6; b.title="Alerts launching soon"; b.onclick=e=>{e.preventDefault(); b.querySelector("span").textContent=lang==="es"?"Alertas muy pronto":"Alerts launching soon";};}}
 fetch("dogs.json",{cache:"no-store"}).then(r=>r.json()).then(j=>{data=j;document.getElementById("sTotal").textContent=j.count;document.getElementById("sNew").textContent=j.dogs.filter(d=>d.first_seen>=cut).length;
- document.getElementById("upd").textContent=T[lang].updated+" "+new Date(j.updated).toLocaleString(lang,{hour:"numeric",minute:"2-digit",month:"short",day:"numeric"});render();renderSh()});
+ document.getElementById("upd").textContent=T[lang].updated+" "+new Date(j.updated).toLocaleString(lang,{hour:"numeric",minute:"2-digit",month:"short",day:"numeric"});chips();render();renderSh()});
 setLang(lang);
 </script></body></html>

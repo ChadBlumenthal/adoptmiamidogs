@@ -3,8 +3,10 @@
 import re, sqlite3, time, datetime, requests
 from bs4 import BeautifulSoup
 DB="data.db"; BASE="https://24petconnect.com"
-SHELTERS={"miad":"Miami-Dade Animal Services","BrowardAllAnimals":"Broward County Animal Care","PBCO":"Palm Beach County Animal Care & Control","hsgm":"Humane Society of Greater Miami","hsbc":"Humane Society of Broward County"}
-NON24={"hsgm","hsbc"}
+SHELTERS={"miad":"Miami-Dade Animal Services","BrowardAllAnimals":"Broward County Animal Care","PBCO":"Palm Beach County Animal Care & Control","hsgm":"Humane Society of Greater Miami","hsbc":"Humane Society of Broward County",
+ "CCDASAllAnimals":"Collier County Domestic Animal Services","LeeCountyAdoptablePets":"Lee County Domestic Animal Services",
+ "SaintLucieAdopt":"St. Lucie County Animal Services","hstc":"Humane Society of the Treasure Coast"}
+NON24={"hsgm","hsbc","hstc"}
 UA={"User-Agent":"AdoptMiamiDogs-MVP/0.2 (free non-commercial adoption alerts; polite 1 req/2s)"}
 SMALL=("chihuahua","yorkshire","shih tzu","maltese","pomeranian","dachshund","miniature","toy","rat terrier","pug","bichon","jack russell","small")
 LARGE=("shepherd","pit bull","american staff","labrador","retriever","rottweiler","mastiff","husky","great dane","doberman","boxer","cane corso","bulldog, american","american bulldog","dogo","large","pyrenees","malinois")
@@ -31,7 +33,7 @@ def db():
         try: c.execute(f"alter table subscribers add column {col}")
         except sqlite3.OperationalError: pass
     c.commit(); return c
-CODES={"miad":"MIAD","BrowardAllAnimals":"BRWD","PBCO":"PBCO"}
+CODES={"miad":"MIAD","BrowardAllAnimals":"BRWD","PBCO":"PBCO","CCDASAllAnimals":"CLLR","LeeCountyAdoptablePets":"LECO","SaintLucieAdopt":"LUCI"}
 def size_from_weight(w): return "small" if w<25 else "medium" if w<=55 else "large"
 def fetch_details(c, limit=None):
     """Fetch per-dog detail pages (1 req / 2s) for dogs not yet detailed."""
@@ -74,7 +76,7 @@ def parse(html, slug):
         out.append(dict(id=f"{slug}:{aid}",shelter=SHELTERS[slug],name=name,breed=t("Breed"),age=t("Age"),age_years=round(ay,2),age_group=age_group(ay),
           sex=t("Gender"),size=size_of(t("Breed")),photo=BASE+img["src"] if img else "",intake_date=t("Broughttotheshelter").replace(".","-"),
           link=f"{BASE}/{slug}/Details/{CODES[slug]}/{aid}",view_type=t("ViewType"),
-          adoptable=0 if (slug in ("BrowardAllAnimals","PBCO") and re.fullmatch(r"A\d+",name.strip(), re.I)) else 1))
+          adoptable=0 if (slug not in ("miad",) and re.fullmatch(r"A\d+",name.strip(), re.I)) else 1))
     tot=re.search(r"of (\d+)",s.select_one("#AnimalCountHeader").get_text()) if s.select_one("#AnimalCountHeader") else None
     return out,int(tot.group(1)) if tot else 0
 HSGM="https://www.humanesocietymiami.org"
@@ -117,7 +119,25 @@ def fetch_hsbc():
         if not n or not tot or len(out)>=int(tot.group(1)): return out
         pg+=1; time.sleep(2)
     return out
+def fetch_hstc():
+    """Humane Society of the Treasure Coast (Martin County): PetPoint/Petango adoptable-search widget embedded on hstc1.org/dogs (no robots.txt on ws.petango.com)."""
+    from urllib.parse import urljoin
+    p=requests.get("https://www.hstc1.org/dogs/",headers=UA,timeout=30).text
+    m=re.search(r'src="(https://ws\.petango\.com/webservices/adoptablesearch/wsAdoptableAnimals2\.aspx[^"]+)"',p)
+    if not m: return []
+    time.sleep(2); u=m.group(1).replace("&amp;","&"); s=BeautifulSoup(requests.get(u,headers=UA,timeout=30).text,"html.parser"); out=[]
+    for g in s.select(".list-item"):
+        a=g.select_one(".list-animal-name a"); 
+        if not a or g.select_one(".list-animal-species").get_text(strip=True)!="Dog": continue
+        i=re.search(r"id=(\d+)",a["href"]).group(1); t=lambda k:(g.select_one(".list-animal-"+k).get_text(" ",strip=True) if g.select_one(".list-animal-"+k) else "")
+        breed=t("breed"); age=t("age"); ay=age_years(age); img=g.select_one("img")
+        sz="large" if "Large" in breed else "small" if "Small" in breed else "medium" if "Medium" in breed else size_of(breed)
+        out.append(dict(id="hstc:"+i,shelter=SHELTERS["hstc"],name=a.get_text(strip=True).title(),breed=re.sub(r",\s*(Small|Medium|Large|Extra)[^/]*","",breed),age=age,
+          age_years=round(ay,2),age_group=age_group(ay),sex=t("sexSN"),size=sz,photo=img["src"] if img else "",intake_date="",
+          link=urljoin(u,a["href"]),view_type="",adoptable=1))
+    return out
 def fetch(slug):
+    if slug=="hstc": return fetch_hstc()
     if slug=="hsgm": return fetch_hsgm()
     if slug=="hsbc": return fetch_hsbc()
     dogs=[]; idx=0
@@ -132,11 +152,13 @@ def run():
         base=not c.execute("select 1 from runs where shelter=?",(slug,)).fetchone()
         dogs=fetch(slug); ids={d["id"] for d in dogs}; n=0
         for d in dogs:
+            if not d["age"]: d["age_group"]="adult"
+            d["sex"]="Female" if "female" in d["sex"].lower() else "Male" if "male" in d["sex"].lower() else d["sex"]
             if not c.execute("select 1 from dogs where id=?",(d["id"],)).fetchone():
                 n+=1; (None if base else new.append(d["id"])); c.execute(f"insert into dogs(id,shelter,name,breed,age,age_years,age_group,sex,size,photo,intake_date,link,view_type,first_seen,last_seen,active,adoptable) values(:id,:shelter,:name,:breed,:age,:age_years,:age_group,:sex,:size,:photo,:intake_date,:link,:view_type,'{now}','{now}',1,:adoptable)",d)
             if d.get("weight"): c.execute("update dogs set weight_lbs=?,size=?,size_source='weight',detail_fetched=1 where id=?",(d["weight"],d["size"],d["id"]))
             elif slug in NON24: c.execute("update dogs set detail_fetched=1 where id=?",(d["id"],))
-            c.execute("update dogs set last_seen=?,active=1,adoptable=?,link=? where id=?",(now,d["adoptable"],d["link"],d["id"]))
+            c.execute("update dogs set last_seen=?,active=1,adoptable=?,link=?,sex=? where id=?",(now,d["adoptable"],d["link"],d["sex"],d["id"]))
         for (i,) in c.execute("select id from dogs where shelter=? and active=1",(SHELTERS[slug],)).fetchall():
             if i not in ids: c.execute("update dogs set active=0 where id=?",(i,))
         c.execute("insert into runs(at,shelter,fetched,new) values(?,?,?,?)",(now,slug,len(dogs),n)); c.commit()
