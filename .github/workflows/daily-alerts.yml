@@ -1,6 +1,6 @@
 name: Daily alert email (8 AM New York)
 on:
-  schedule: [{cron: "0 12 * * *"}, {cron: "0 13 * * *"}]   # EDT and EST; script runs only when it's 8 AM in New York
+  schedule: [{cron: "0 12 * * *"}, {cron: "0 13 * * *"}, {cron: "23 14-20 * * *"}]   # extra hourly retries because GitHub drops/delays cron runs; script gates to 8 AM-4 PM New York and dedupes to 1 email/day per subscriber
   workflow_dispatch:
     inputs:
       test: {description: 'Test send to the single subscriber', type: boolean, default: false}
